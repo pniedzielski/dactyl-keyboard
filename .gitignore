@@ -26,3 +26,4 @@ config/
 **/*.iml
 
 /src/.ipynb_checkpoints/
+/src/run_config.json

@@ -1,0 +1,9 @@
+services:
+  generator:
+    build: docker
+    volumes:
+      - ./src:/app/src
+      - ./things:/app/things
+      - ./configs:/app/configs
+      - ./.git:/app/.git
+    command: /app/build.sh

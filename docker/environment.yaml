@@ -1,0 +1,10 @@
+name: dactyl-manuform
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - cadquery
+  - dataclasses-json
+  - numpy
+  - scipy
+  - gitpython
