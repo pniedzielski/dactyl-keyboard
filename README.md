@@ -1,3 +1,38 @@
+# pniedzielski Dactyl Manuform
+Now that Wylderbuilds is no more, I’m still in need of a keyboard
+print, but now I have to do it myself.  His Dactyl Manuform generator
+is still the best available, and looks like it’s the best one for
+generating a 6x7 resin print with 1.5u pinky keys and a Carbonfet
+thumbcluster.  So, this is a fork of his, with a few changes to make
+things nicer for me.
+
+First, I’ve brought back the Docker workflow, so I don’t have to worry
+about poluting my local development environment.  This seems to be
+different than joshreve’s original Docker workflow, and it’s probably
+worse.  But, it works well enough to generate what I need.
+
+Second, I prefer laser-cut acrylic bases for my builds, rather than 3d
+printed ones.  So, the docker-compose workflow here runs both Cadquery
+(for higher quality STLs) and Solid (for OpenSCAD bases, which I can
+then convert into SVGs).
+
+Third, I have manually moved some of the screw posts fully inside the
+case for a 6x7 print.  This change may make other configurations not
+correct, so check before you use this for anything else.
+
+  - To run the generator, do
+    ```
+    docker compose up
+    ```
+
+  - To modify the configuration, please edit the
+    `configs/default.json` file (rather than the `src/run_config.json`
+    file).
+
+I’m not maintaining the customizations that Andy made to this
+generator, but I’ve preserved them in the code.  It should be possible
+to resurrect them if you are interested.
+
 # Wylderbuilds Dactyl Manuform - Python 3 - Cadquery
 So, THIS is a fork of a fork of a fork of a... You get the idea.
 
