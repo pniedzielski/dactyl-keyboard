@@ -220,7 +220,7 @@ class CarbonfetCluster(DefaultCluster):
         hulls.append(
             triangle_hulls(
                 [
-                    key_place(web_post_bl(), 0, cornerrow),
+                    key_place(web_post_bl(), 0, cornerrow - 1 if shift_column else cornerrow),
                     self.ml_place(self.thumb_post_tl()),
                     cluster_key_place(web_post_bl(), 0, cornerrow),
 
@@ -341,7 +341,7 @@ class CarbonfetCluster(DefaultCluster):
         shape = bottom_hull(
             [
                 left_key_place(translate(web_post(), wall_locate2(-1, 0)), cornerrow, -1, low_corner=True, side=side),
-                left_key_place(translate(web_post(), wall_locate3(-1, 0.5)), cornerrow, -1, low_corner=True, side=side),
+                left_key_place(translate(web_post(), wall_locate3(-1, 0 if shift_column else 0.5)), cornerrow, -1, low_corner=True, side=side),
                 self.bl_place(translate(self.thumb_post_tr(), wall_locate2(-0.3, 1))),
                 self.bl_place(translate(self.thumb_post_tr(), wall_locate3(-0.3, 1))),
             ]
@@ -377,10 +377,10 @@ class CarbonfetCluster(DefaultCluster):
         shape = union([shape,
                        hull_from_shapes(
                            [
-                               left_key_place(web_post(), cornerrow, -1, low_corner=True, side=side),
+                               left_key_place(web_post(), cornerrow - 1 if shift_column else cornerrow, -1, low_corner=True, side=side),
                                left_key_place(translate(web_post(), wall_locate1(-1, 0)), cornerrow, -1,
                                               low_corner=True, side=side),
-                               key_place(web_post_bl(), 0, cornerrow),
+                               key_place(web_post_bl(), 0, cornerrow - 1 if shift_column else cornerrow),
                                self.ml_place(self.thumb_post_tl()),
                            ]
                        )])

@@ -880,8 +880,8 @@ def make_dactyl():
         return shape
 
     def bottom_key(column):
-        # if column < shift_column:  # attempt to make inner columns fewer keys
-        #     return nrows - 3
+        if column < shift_column:  # attempt to make inner columns fewer keys
+            return nrows - 3
         if all_last_rows:
             return nrows - 1
         cluster_columns = 2 + shift_column
@@ -1069,6 +1069,27 @@ def make_dactyl():
                 places.append(key_place(web_post_bl(), column + 1, next_row))
                 places.append(key_place(web_post_tl(), column + 1, next_row + 1))
                 hulls.append(triangle_hulls(places))
+
+        if shift_column:
+            column = 0
+            row = get_torow(column)
+            places = [
+                key_place(web_post_br(), column, row - 1),
+                key_place(web_post_bl(), column + shift_column, row - 1),
+                key_place(web_post_tr(), column, row),
+                key_place(web_post_tl(), column + shift_column, row),
+
+                key_place(web_post_bl(), column, row - 1),
+                key_place(web_post_br(), column, row - 1),
+                key_place(web_post_tr(), column, row),
+                key_place(web_post_tr(), column, row),
+
+                key_place(web_post_bl(), column, row - 1),
+                key_place(web_post_tl(), column + shift_column, row),
+                key_place(web_post_bl(), column + shift_column, row),
+                key_place(web_post_bl(), column + shift_column, row),
+            ]
+            hulls.append(triangle_hulls(places))
 
         return union(hulls)
 
@@ -1411,10 +1432,14 @@ def make_dactyl():
             (lambda sh: left_key_place(sh, 0, 1, side=side)), -1, 0, web_post(),
         )])
 
+        torow = lastrow
+        if shift_column:
+            torow -= 1
+
         if not corner_walls:
-            for i in range(lastrow):
+            for i in range(torow):
                 y = i
-                low = (y == (lastrow - 1))
+                low = (y == (torow - 1))
                 temp_shape1 = wall_brace(
                     (lambda sh: left_key_place(sh, y, 1, side=side)), -1, 0, web_post(),
                     (lambda sh: left_key_place(sh, y, -1, low_corner=low, side=side)), -1, 0, web_post(),
@@ -1429,9 +1454,9 @@ def make_dactyl():
                 shape = union([shape, temp_shape2])
 
 
-            for i in range(lastrow - 1):
+            for i in range(torow - 1):
                 y = i + 1
-                low = (y == (lastrow - 1))
+                low = (y == (torow - 1))
                 temp_shape1 = wall_brace(
                     (lambda sh: left_key_place(sh, y - 1, -1, side=side)), -1, 0, web_post(),
                     (lambda sh: left_key_place(sh, y, 1, side=side)), -1, 0, web_post(),
