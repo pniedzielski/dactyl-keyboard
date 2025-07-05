@@ -836,10 +836,15 @@ def make_dactyl():
         column_angle = beta * (centercol - column)
 
         column_x_delta_actual = column_x_delta
-        if (pinky_1_5U and column == lastcol):
-            if row >= first_1_5U_row and row <= last_1_5U_row:
-                column_x_delta_actual = column_x_delta - 1.5
-                column_angle = beta * (centercol - column - 0.27)
+        if pinky_1_5U:
+            if column == lastcol:
+                if row >= first_1_5U_row and row <= last_1_5U_row:
+                    column_x_delta_actual = column_x_delta - 1.5
+                    column_angle = beta * (centercol - column - 0.27)
+            if column > lastcol:
+                if row >= first_1_5U_row and row <= last_1_5U_row:
+                    column_x_delta_actual = column_x_delta - 0.75
+                    column_angle = beta * (centercol - column - 0.27)
 
         # if row == 0:      ## POLYDACTYL OLD INCLINED TOP ROW
         #     shape = translate_fn(shape, [0, 5, 2.1])
@@ -1030,7 +1035,10 @@ def make_dactyl():
     def connectors():
         debugprint('connectors()')
         hulls = []
-        for column in range(ncols - 1):
+
+        tocol = ncols if pinky_1_5U else ncols - 1
+
+        for column in range(tocol):
             torow = get_torow(column)
             if not full_last_rows and column == 3:
                 torow -= 1
@@ -1057,7 +1065,7 @@ def make_dactyl():
                 places.append(key_place(web_post_tr(), column, row + 1))
                 hulls.append(triangle_hulls(places))
 
-        for column in range(ncols - 1):
+        for column in range(tocol):
             torow = get_torow(column)
             # for row in range(nrows-1):  # need to consider last_row?
             for row in range(torow - 1):  # need to consider last_row?
@@ -1384,39 +1392,75 @@ def make_dactyl():
     def right_wall():
         print("right_wall()")
 
-        torow = lastrow - 1
+        if pinky_1_5U:
+            torow = lastrow - 1
 
-        if (full_last_rows or ncols < 5):
-            torow = lastrow
+            if (full_last_rows or ncols < 5):
+                torow = lastrow
 
-        tocol = lastcol
+            tocol = lastcol + 1
 
-        y = 0
-        shape = union([
-            key_wall_brace(
-                tocol, y, 1, 0, web_post_tr(), tocol, y, 1, 0, web_post_br()
-            )
-        ])
+            y = 0
+            shape = union([
+                key_wall_brace(
+                    tocol, y, 1, 0, web_post_tl(), tocol, y, 1, 0, web_post_bl()
+                )
+            ])
 
 
-        if not corner_walls:
-            for i in range(torow):
-                y = i + 1
-                shape = union([shape, key_wall_brace(
-                    tocol, y - 1, 1, 0, web_post_br(), tocol, y, 1, 0, web_post_tr()
-                )])
+            if not corner_walls:
+                for i in range(torow):
+                    y = i + 1
+                    shape = union([shape, key_wall_brace(
+                        tocol, y - 1, 1, 0, web_post_bl(), tocol, y, 1, 0, web_post_tl()
+                    )])
 
-                shape = union([shape, key_wall_brace(
+                    shape = union([shape, key_wall_brace(
+                        tocol, y, 1, 0, web_post_tl(), tocol, y, 1, 0, web_post_bl()
+                    )])
+
+                    # STRANGE PARTIAL OFFSET
+
+                if ncols > 4:
+                    shape = union([
+                        shape,
+                        key_wall_brace(lastcol, torow, 0, -1, web_post_br(), lastcol + 1, torow, 1, 0, web_post_bl())
+                    ])
+        else:
+            torow = lastrow - 1
+
+            if (full_last_rows or ncols < 5):
+                torow = lastrow
+
+            tocol = lastcol
+
+            y = 0
+            shape = union([
+                key_wall_brace(
                     tocol, y, 1, 0, web_post_tr(), tocol, y, 1, 0, web_post_br()
-                )])
+                )
+            ])
 
-                # STRANGE PARTIAL OFFSET
 
-            if ncols > 4:
-                shape = union([
-                    shape,
-                    key_wall_brace(lastcol, torow, 0, -1, web_post_br(), lastcol, torow, 1, 0, web_post_br())
-                ])
+            if not corner_walls:
+                for i in range(torow):
+                    y = i + 1
+                    shape = union([shape, key_wall_brace(
+                        tocol, y - 1, 1, 0, web_post_br(), tocol, y, 1, 0, web_post_tr()
+                    )])
+
+                    shape = union([shape, key_wall_brace(
+                        tocol, y, 1, 0, web_post_tr(), tocol, y, 1, 0, web_post_br()
+                    )])
+
+                    # STRANGE PARTIAL OFFSET
+
+                    if ncols > 4:
+                        shape = union([
+                            shape,
+                            key_wall_brace(lastcol, torow, 0, -1, web_post_br(), lastcol, torow, 1, 0, web_post_br())
+                        ])
+
         return shape
 
 
@@ -1477,11 +1521,19 @@ def make_dactyl():
     def front_wall():
         print('front_wall()')
 
-        shape = union([
-            key_wall_brace(
-                lastcol, 0, 0, 1, web_post_tr(), lastcol, 0, 1, 0, web_post_tr()
-            )
-        ])
+        if pinky_1_5U:
+            shape = union([
+                key_wall_brace(
+                    lastcol, 0, 0, 1, web_post_tr(), lastcol + 1, 0, 1, 0, web_post_tl()
+                )
+            ])
+        else:
+            shape = union([
+                key_wall_brace(
+                    lastcol, 0, 0, 1, web_post_tr(), lastcol, 0, 1, 0, web_post_tr()
+                )
+            ])
+
         if not corner_walls:
             shape = union([shape, key_wall_brace(
                 col(3), bottom_key(col(3)), 0, -1, web_post_bl(), col(3), bottom_key(col(3)), 0, -1, web_post_br()
@@ -2441,6 +2493,7 @@ def make_dactyl():
     def screw_insert_all_shapes(bottom_radius, top_radius, height, offset=0, side='right', hole=False):
         print('screw_insert_all_shapes()')
         so = screw_offsets
+        pinky_1_5U_x_offset = 3 if pinky_1_5U else 0
         shape = (
             translate(screw_insert(0, 0, bottom_radius, top_radius, height, side=side, hole=hole), (so[0][0], so[0][1], so[0][2] + offset)),  # rear left
             translate(screw_insert(0, lastrow - 1, bottom_radius, top_radius, height, side=side, hole=hole),
@@ -2449,9 +2502,9 @@ def make_dactyl():
                       (so[2][0], so[2][1], so[2][2] + offset)),  # front middle
             translate(screw_insert(3, 0, bottom_radius, top_radius, height, side=side, hole=hole), (so[3][0], so[3][1], so[3][2] + offset)),  # rear middle
             translate(screw_insert(lastcol, 0, bottom_radius, top_radius, height, side=side, hole=hole),
-                      (so[4][0], so[4][1], so[4][2] + offset)),  # rear right
+                      (so[4][0] + pinky_1_5U_x_offset, so[4][1], so[4][2] + offset)),  # rear right
             translate(screw_insert(lastcol, lastrow - 1, bottom_radius, top_radius, height, side=side, hole=hole),
-                      (so[5][0], so[5][1], so[5][2] + offset)),  # front right
+                      (so[5][0] + pinky_1_5U_x_offset + 4, so[5][1], so[5][2] + offset)),  # front right
             translate(screw_insert_thumb(bottom_radius, top_radius, height, side=side, hole=hole), (so[6][0], so[6][1], so[6][2] + offset)),  # thumb cluster
         )
 
